@@ -143,6 +143,7 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
     @Override
     public void afterTextChanged(Editable s) {
         String key = s.toString();
+        editText.setSelection(key.length());
         if (!TextUtils.isEmpty(key)) {
             findData(key);
         } else {
@@ -160,9 +161,11 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
                 cacheData.add(s);
             }
         }
+        adapter.notifyDataSetChanged();
         if (cacheData.size() > 0) {
-            adapter.notifyDataSetChanged();
             popupWindow.show();
+        }else {
+            popupWindow.dismiss();
         }
     }
 }

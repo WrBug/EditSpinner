@@ -27,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
         list.add("EditSpinner");
         list.add("Test");
         list.add("123456789");
+        list.add("123456788");
+        list.add("123456777");
+        list.add("123456666");
+        list.add("123455555");
+        list.add("123444444");
+        list.add("123333333");
+        list.add("122222222");
+
         spinner1.setItemData(list);
         spinner2.setItemData(list);
     }
