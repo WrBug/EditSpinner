@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/EditSpinner.iml" filepath="$PROJECT_DIR$/EditSpinner.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/editspinner/editspinner.iml" filepath="$PROJECT_DIR$/editspinner/editspinner.iml" />
     </modules>
   </component>
 </project>
