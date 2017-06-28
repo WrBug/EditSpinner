@@ -9,7 +9,9 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -35,10 +37,11 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
     private Context mContext;
     private ListPopupWindow popupWindow;
     BaseEditSpinnerAdapter adapter;
-    private TypedArray tArray;
-    private boolean isPopupWindowShowing;
+    private long popupWindowHideTime;
     private Animation mAnimation;
     private Animation mResetAnimation;
+    private AdapterView.OnItemClickListener mOnItemClickListener;
+    private int maxLine = 1;
 
     public EditSpinner(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -51,6 +54,10 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
     public void setItemData(List<String> data) {
         adapter = new SimpleAdapter(mContext, data);
         setAdapter(adapter);
+    }
+
+    public void setOnItemClickListener(AdapterView.OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
     }
 
     public void setText(String text) {
@@ -82,6 +89,11 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
         setBaseAdapter(this.adapter);
     }
 
+    public void setMaxLine(int maxLine) {
+        this.maxLine = maxLine;
+        editText.setMaxLines(this.maxLine);
+    }
+
     private void initAnimation() {
         mAnimation = new RotateAnimation(0, -90, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         mAnimation.setDuration(300);
@@ -101,7 +113,7 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
         mRightIv.setOnClickListener(this);
         mRightIv.setRotation(90);
         editText.addTextChangedListener(this);
-        tArray = mContext.obtainStyledAttributes(attrs,
+        TypedArray tArray = mContext.obtainStyledAttributes(attrs,
                 R.styleable.EditSpinner);
         editText.setHint(tArray.getString(R.styleable.EditSpinner_hint));
         int imageId = tArray.getResourceId(R.styleable.EditSpinner_rightImage, 0);
@@ -112,6 +124,8 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
         if (bg != 0) {
             editText.setBackgroundResource(bg);
         }
+        maxLine = tArray.getInt(R.styleable.EditSpinner_maxLine, 1);
+        editText.setMaxLines(maxLine);
         tArray.recycle();
     }
 
@@ -124,18 +138,19 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
 
     private void initPopupWindow() {
         popupWindow = new ListPopupWindow(mContext) {
-            @Override
-            public boolean isShowing() {
-                return isPopupWindowShowing;
-            }
 
             @Override
             public void show() {
                 super.show();
-                isPopupWindowShowing = true;
                 mRightImageTopView.setClickable(true);
                 mRightIv.startAnimation(mAnimation);
             }
+
+            @Override
+            public void dismiss() {
+                super.dismiss();
+            }
+
         };
         popupWindow.setOnItemClickListener(this);
         popupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -146,7 +161,7 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
             public void onDismiss() {
-                isPopupWindowShowing = false;
+                popupWindowHideTime = System.currentTimeMillis();
                 mRightIv.startAnimation(mResetAnimation);
             }
         });
@@ -155,18 +170,14 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
 
     @Override
     public final void onClick(View v) {
-        if (adapter == null || popupWindow == null) {
-            return;
-        }
-        if (v.getId() == R.id.edit_spinner_expand_above) {
-            v.setClickable(false);
-            return;
-        }
-        if (popupWindow.isShowing()) {
-            popupWindow.dismiss();
-        } else {
-//            cacheData.clear();
-//            cacheData.addAll(data);
+        togglePopupWindow();
+    }
+
+    private void togglePopupWindow() {
+        if (System.currentTimeMillis() - popupWindowHideTime > 200) {
+            if (adapter == null || popupWindow == null) {
+                return;
+            }
             showFilterData("");
         }
     }
@@ -176,6 +187,9 @@ public class EditSpinner extends RelativeLayout implements View.OnClickListener,
         editText.setText(((BaseEditSpinnerAdapter) parent.getAdapter()).getItemString(position));
         mRightImageTopView.setClickable(false);
         popupWindow.dismiss();
+        if (mOnItemClickListener != null) {
+            mOnItemClickListener.onItemClick(parent, view, position, id);
+        }
     }
 
     @Override

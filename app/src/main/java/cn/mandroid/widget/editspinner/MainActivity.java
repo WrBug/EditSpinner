@@ -1,8 +1,12 @@
 package cn.mandroid.widget.editspinner;
 
+import android.app.Activity;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.wrbug.editspinner.EditSpinner;
 
@@ -40,6 +44,13 @@ public class MainActivity extends AppCompatActivity {
         list.add("123333333");
         list.add("122222222");
         spinner1.setItemData(list);
+        spinner1.setMaxLine(3);
         spinner2.setItemData(list);
+        spinner2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("EditSpinner", "item " + position + " click");
+            }
+        });
     }
 }
