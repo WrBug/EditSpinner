@@ -9,7 +9,7 @@
 ### Gradle
 
 ``` gradle
-compile 'com.wrbug:editspinner:1.0.0'
+compile 'com.wrbug:editspinner:1.1.0'
 ```
 ### Maven
 
@@ -17,7 +17,7 @@ compile 'com.wrbug:editspinner:1.0.0'
 <dependency>
   <groupId>com.wrbug</groupId>
   <artifactId>editspinner</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <type>pom</type>
 </dependency>
 ```
